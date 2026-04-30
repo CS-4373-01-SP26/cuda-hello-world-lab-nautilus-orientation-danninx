@@ -1,0 +1,55 @@
+# File: k8s/gpu-dev-pod.yaml
+#
+# Purpose: Interactive development pod for the CUDA Hello World lab.
+#          One GPU, CUDA 12 toolkit pre-installed.
+#
+# Namespace: tandy-hpc
+#
+# POLICY NOTES:
+#   - "sleep infinity" in a Pod is ALLOWED by Nautilus cluster policy.
+#   - "sleep infinity" in a Job is PROHIBITED and bannable.
+#     This is a Pod spec — you are fine.
+#   - The cluster HARD-DELETES interactive pods after 6 hours.
+#     Push your work to GitHub before leaving a session.
+#   - DELETE this pod when you are done working:
+#       kubectl delete pod hello-dev-pod -n tandy-hpc
+#
+# BEFORE APPLYING: fill in your NRP username in the label below.
+# Find your NRP username by running:  kubectl auth whoami
+#
+# Usage:
+#   kubectl apply  -f k8s/gpu-dev-pod.yaml -n tandy-hpc
+#   kubectl get    pods -n tandy-hpc -w            # wait for Running
+#   kubectl exec  -it hello-dev-pod -n tandy-hpc -- /bin/bash
+#   kubectl delete -f k8s/gpu-dev-pod.yaml -n tandy-hpc   # when done
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello-dev-pod
+  namespace: tandy-hpc
+  labels:
+    app: cuda-hello
+    user: CHANGE_TO_YOUR_NRP_USERNAME    # <-- edit this line
+spec:
+  restartPolicy: Never
+  containers:
+  - name: cuda-hello
+    image: nvidia/cuda:12.2.0-devel-ubuntu22.04
+    command: ["/bin/bash", "-c", "sleep infinity"]
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "1"
+        nvidia.com/gpu: "1"
+      limits:
+        memory: "2Gi"
+        cpu: "2"
+        nvidia.com/gpu: "1"
+    env:
+    - name: DEBIAN_FRONTEND
+      value: noninteractive
+    - name: NVIDIA_VISIBLE_DEVICES
+      value: all
+    - name: NVIDIA_DRIVER_CAPABILITIES
+      value: compute,utility

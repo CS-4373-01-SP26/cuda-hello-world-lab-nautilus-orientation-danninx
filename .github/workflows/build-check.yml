@@ -1,0 +1,45 @@
+# File: .github/workflows/build-check.yml
+#
+# Purpose: Compile-only CI on GitHub's free Ubuntu runners.
+#          No GPU is available — this only verifies the code compiles.
+#          Actual execution must be done on Nautilus (see instructions).
+#
+# Result visible in: your repo -> Actions tab
+#   Green check  = code compiles cleanly
+#   Red X        = compilation error; read the log
+
+name: Build Check (compile only)
+
+on:
+  push:
+    branches: ["**"]
+
+jobs:
+  build:
+    name: nvcc compile check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install CUDA toolkit (nvcc only)
+      uses: Jimver/cuda-toolkit@v0.2.35
+      with:
+        cuda: '12.2.0'
+        method: network
+        sub-packages: '["nvcc"]'
+
+    - name: Verify nvcc
+      run: nvcc --version
+
+    - name: Compile cuda_hello
+      run: |
+        nvcc -arch=sm_70 -O2 -o /tmp/cuda_hello cuda_hello.cu
+        echo "cuda_hello compiled OK"
+
+    - name: Summary
+      run: |
+        echo "Build succeeded. To run on a real GPU, use a Nautilus pod."
+        echo "See docs/student-instructions.md for step-by-step instructions."
