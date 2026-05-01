@@ -13,7 +13,9 @@ ARCH      ?= $(shell nvidia-smi --query-gpu=compute_cap \
                | head -1 | tr -d '.' | sed 's/^/sm_/' || echo sm_70)
 NVCCFLAGS := -arch=$(ARCH) -O2
 
-.PHONY: all clean check_arch docker
+NVCC_DEFAULT_ARCH := sm_75 sm_80 sm_86 sm_87 sm_88 sm_89 sm_90 sm_100 sm_110 sm_103 sm_120 sm_121
+
+.PHONY: all clean check_arch docker $(NVCC_DEFAULT_ARCH)
 
 all: check_arch cuda_hello
 
@@ -26,6 +28,8 @@ cuda_hello: cuda_hello.cu
 clean:
 	rm -f cuda_hello
 
-docker:
-	docker build . -t danninx/cs-4373:hello-cuda
-	docker push danninx/cs-4373:hello-cuda
+docker: $(NVCC_DEFAULT_ARCH)
+
+$(NVCC_DEFAULT_ARCH):
+	docker build --build-arg ARCH=$@ . -t danninx/cs-4373:hello-cuda-$@
+	docker push danninx/cs-4373:hello-cuda-$@
