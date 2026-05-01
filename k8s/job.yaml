@@ -1,25 +1,10 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: drf8024-hello-cuda-pvc
-  labels:
-    app: cuda-hello
-    user: http://cilogon.org/serverE/users/495644
-spec:
-  storageClassName: rook-ceph-block
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Mi
----
 apiVersion: batch/v1
 kind: Job  
 metadata:
   name: drf8024-hello-cuda
   labels: 
     app: cuda-hello
-    user: http://cilogon.org/serverE/users/495644
+    user: drf8024
 spec:
   backoffLimit: 4  
   template:
@@ -29,26 +14,45 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
               - matchExpressions:
+                  - key: topology.kubernetes.io/region
+                    operator: In
+                    values:
+                    - us-west
                   - key: nvidia.com/gpu.product
                     operator: In  
                     values:       
-                      - NVIDIA-GeForce-RTX-3090
+                    - NVIDIA-GeForce-RTX-2080-Ti
       containers:
         - name: hello-cuda
-          image: danninx/cs-4373:hello-cuda-sm_86  
+          image: danninx/cs-4373:hello-cuda-sm_75
           command: ["/bin/sh", "-c", "/app/bin/cuda_hello 100 > /var/data/outputs/hello_cuda.out"]
           volumeMounts:
           - mountPath: /var/data
-            name: persistentStorage
+            name: output-storage
+          resources:
+            requests:
+              cpu: "100m"          
+              memory: "2Gi"     
+            limits:
+              cpu: "150m"
+              memory: "2Gi"     
+              nvidia.com/gpu: 1 
       initContainers:
         - name: format-output-dir
           image: busybox
           command: ["mkdir", "-p", "/var/data/outputs"]
           volumeMounts:
           - mountPath: /var/data
-            name: persistentStorage
+            name: output-storage
+          resources:
+            requests:
+                cpu: "100m"       
+                memory: "100Mi"   
+            limits:
+                cpu: "150m"
+                memory: "150Mi"   
       restartPolicy: Never
       volumes:
-        - name: persistentStorage
+        - name: output-storage
           persistentVolumeClaim:
             claimName: drf8024-hello-cuda-pvc  

@@ -3,3 +3,26 @@
 
 See [docs/student-instructions.md](docs/student-instructions.md)
 for complete step-by-step instructions.
+
+theory crafting a workflow that doesn't require me to put my GH token in a pod every time i wanna work on this
+
+Run the job:
+
+```sh
+kubectl apply -f k8s/pvc.yaml k8s/job.yaml
+```
+
+Once the job is done, mount the pvc to a temp pod to view results:
+
+```sh
+kubectl apply -f k8s/inspector.yaml
+kubectl exec -it <pod_name> -- /bin/sh
+
+# cat /var/data/outputs/hello_cuda.out
+```
+
+Cleanup
+
+```sh
+bash ./cleanup.sh
+```

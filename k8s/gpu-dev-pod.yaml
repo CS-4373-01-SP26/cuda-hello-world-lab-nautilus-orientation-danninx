@@ -22,34 +22,33 @@
 #   kubectl get    pods -n tandy-hpc -w            # wait for Running
 #   kubectl exec  -it hello-dev-pod -n tandy-hpc -- /bin/bash
 #   kubectl delete -f k8s/gpu-dev-pod.yaml -n tandy-hpc   # when done
-
-apiVersion: v1
-kind: Pod
-metadata:
-  name: hello-dev-pod
-  namespace: tandy-hpc
-  labels:
-    app: cuda-hello
-    user: CHANGE_TO_YOUR_NRP_USERNAME    # <-- edit this line
-spec:
-  restartPolicy: Never
-  containers:
-  - name: cuda-hello
-    image: nvidia/cuda:13.0.3-devel-ubuntu24.04
-    command: ["/bin/bash", "-c", "sleep infinity"]
-    resources:
-      requests:
-        memory: "1Gi"
-        cpu: "1"
-        nvidia.com/gpu: "1"
-      limits:
-        memory: "2Gi"
-        cpu: "2"
-        nvidia.com/gpu: "1"
-    env:
-    - name: DEBIAN_FRONTEND
-      value: noninteractive
-    - name: NVIDIA_VISIBLE_DEVICES
-      value: all
-    - name: NVIDIA_DRIVER_CAPABILITIES
-      value: compute,utility
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: hello-dev-pod
+#   namespace: tandy-hpc
+#   labels:
+#     app: cuda-hello
+#     user: CHANGE_TO_YOUR_NRP_USERNAME    # <-- edit this line
+# spec:
+#   restartPolicy: Never
+#   containers:
+#   - name: cuda-hello
+#     image: nvidia/cuda:13.0.3-devel-ubuntu24.04
+#     command: ["/bin/bash", "-c", "sleep infinity"]
+#     resources:
+#       requests:
+#         memory: "1Gi"
+#         cpu: "1"
+#         nvidia.com/gpu: "1"
+#       limits:
+#         memory: "2Gi"
+#         cpu: "2"
+#         nvidia.com/gpu: "1"
+#     env:
+#     - name: DEBIAN_FRONTEND
+#       value: noninteractive
+#     - name: NVIDIA_VISIBLE_DEVICES
+#       value: all
+#     - name: NVIDIA_DRIVER_CAPABILITIES
+#       value: compute,utility

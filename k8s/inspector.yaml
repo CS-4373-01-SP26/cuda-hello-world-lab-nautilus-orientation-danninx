@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: output-viewer
+  labels: 
+    app: cuda-hello
+    user: drf8024
+spec:
+  containers:
+  - image: busybox
+    name: output-viewer
+    command: ["/bin/sh", "-c", "sleep infinity"]
+    volumeMounts:
+    - mountPath: /var/data
+      name: output-storage
+    resources:
+      requests:
+        cpu: "100m"          
+        memory: "2Gi"     
+      limits:
+        cpu: "150m"
+        memory: "2Gi"     
+  volumes:
+    - name: output-storage
+      persistentVolumeClaim:
+        claimName: drf8024-hello-cuda-pvc  
+
