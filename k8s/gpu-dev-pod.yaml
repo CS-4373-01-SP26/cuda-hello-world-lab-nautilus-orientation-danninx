@@ -35,7 +35,7 @@ spec:
   restartPolicy: Never
   containers:
   - name: cuda-hello
-    image: nvidia/cuda:12.2.0-devel-ubuntu22.04
+    image: nvidia/cuda:13.0.3-devel-ubuntu24.04
     command: ["/bin/bash", "-c", "sleep infinity"]
     resources:
       requests:

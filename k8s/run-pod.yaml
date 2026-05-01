@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Pod
+metadata:
+  name: drf8024-hello-cuda
+  labels: 
+    app: cuda-hello
+    user: http://cilogon.org/serverE/users/495644
+spec:
+  template:
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nvidia.com/gpu.product
+          operator: In
+          values:
+            - NVIDIA-GeForce-RTX-3090
+      containers:
+        - name: hello-cuda
+          image: danninx/cs-4373:hello-cuda
+          command: ["/app/bin/hello_cuda", "100", ">", "/var/data/outputs/hello_cuda.out"]
+          volumeMounts:
+          - mountPath: /var/data
+            name: persistentStorage
+      initContainers:
+        - name: format-output-dir
+          image: busybox
+          command: ["mkdir", "-p", "/var/data/outputs"]
+          volumeMounts:
+          - mountPath: /var/data
+            name: persistentStorage
+      restartPolicy: Never
+      volumes:
+        - name: persistentStorage
+          persistentVolumeClaim:
+            claimName: drf8024-hello-cuda-pvc
+  backoffLimit: 4
+
