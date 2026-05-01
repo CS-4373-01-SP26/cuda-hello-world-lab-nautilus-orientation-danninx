@@ -1,11 +1,27 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: drf8024-hello-cuda-pvc
+  labels:
+    app: cuda-hello
+    user: http://cilogon.org/serverE/users/495644
+spec:
+  storageClassName: rook-ceph-block
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Mi
+---
 apiVersion: batch/v1
-kind: Pod
+kind: Job  
 metadata:
   name: drf8024-hello-cuda
   labels: 
     app: cuda-hello
     user: http://cilogon.org/serverE/users/495644
 spec:
+  backoffLimit: 4  
   template:
     spec:
       affinity:
@@ -14,13 +30,13 @@ spec:
             nodeSelectorTerms:
               - matchExpressions:
                   - key: nvidia.com/gpu.product
-          operator: In
-          values:
-            - NVIDIA-GeForce-RTX-3090
+                    operator: In  
+                    values:       
+                      - NVIDIA-GeForce-RTX-3090
       containers:
         - name: hello-cuda
-          image: danninx/cs-4373:hello-cuda
-          command: ["/app/bin/hello_cuda", "100", ">", "/var/data/outputs/hello_cuda.out"]
+          image: danninx/cs-4373:hello-cuda-sm_86  
+          command: ["/bin/sh", "-c", "/app/bin/cuda_hello 100 > /var/data/outputs/hello_cuda.out"]
           volumeMounts:
           - mountPath: /var/data
             name: persistentStorage
@@ -35,6 +51,4 @@ spec:
       volumes:
         - name: persistentStorage
           persistentVolumeClaim:
-            claimName: drf8024-hello-cuda-pvc
-  backoffLimit: 4
-
+            claimName: drf8024-hello-cuda-pvc  
