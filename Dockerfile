@@ -4,6 +4,8 @@ ARG ARCH="sm_89"
 # CUDA 13.0.3
 FROM nvidia/cuda:13.0.3-devel-ubuntu24.04 AS build
 
+ARG ARCH
+
 WORKDIR /app
 COPY Makefile Makefile
 COPY cuda_hello.cu cuda_hello.cu
