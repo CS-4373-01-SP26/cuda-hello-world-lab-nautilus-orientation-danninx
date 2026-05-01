@@ -27,5 +27,5 @@ clean:
 	rm -f cuda_hello
 
 docker:
-	docker build -t danninx/cs-4373:hello-cuda
+	docker build . -t danninx/cs-4373:hello-cuda
 	docker push danninx/cs-4373:hello-cuda
