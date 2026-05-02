@@ -25,7 +25,6 @@ spec:
       containers:
         - name: hello-cuda
           image: danninx/cs-4373:hello-cuda-sm_75
-          command: ["/bin/sh", "-c", "/app/bin/cuda_hello 100 > /var/data/outputs/hello_cuda.out"]
           volumeMounts:
           - mountPath: /var/data
             name: output-storage
@@ -37,20 +36,6 @@ spec:
               cpu: "150m"
               memory: "2Gi"     
               nvidia.com/gpu: 1 
-      initContainers:
-        - name: format-output-dir
-          image: busybox
-          command: ["mkdir", "-p", "/var/data/outputs"]
-          volumeMounts:
-          - mountPath: /var/data
-            name: output-storage
-          resources:
-            requests:
-                cpu: "100m"       
-                memory: "100Mi"   
-            limits:
-                cpu: "150m"
-                memory: "150Mi"   
       restartPolicy: Never
       volumes:
         - name: output-storage
